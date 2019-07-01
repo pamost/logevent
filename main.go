@@ -8,13 +8,6 @@ import (
 	"time"
 )
 
-var (
-	bufferSubmit, bufferAccept bytes.Buffer
-	sendTime                   string = time.Now().Format("2006-01-02")
-	submitted                  string = "submitted"
-	accepted                   string = "accepted"
-)
-
 type Event interface {
 	Send() []byte
 }
@@ -31,15 +24,17 @@ type HwAccepted struct {
 }
 
 func (hws *HwSubmitted) Send() []byte {
+	sendTime := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 	id := strconv.Itoa(hws.Id)
 	comment := string(hws.Comment)
-	return []byte(sendTime + " " + submitted + " " + id + " " + comment + "\n")
+	return []byte(fmt.Sprintf("%s submitted %s %s\n", sendTime, id, comment))
 }
 
 func (hwa *HwAccepted) Send() []byte {
+	sendTime := time.Now().Format("2006-01-02")
 	id := strconv.Itoa(hwa.Id)
-	grade := strconv.Itoa(hwa.Id)
-	return []byte(sendTime + " " + accepted + " " + id + " " + grade + "\n")
+	grade := strconv.Itoa(hwa.Grade)
+	return []byte(fmt.Sprintf("%s accepted %s %s\n", sendTime, id, grade))
 }
 
 func LogEvent(e Event, w io.Writer) {
@@ -47,6 +42,9 @@ func LogEvent(e Event, w io.Writer) {
 }
 
 func main() {
+
+	var bufferSubmit, bufferAccept bytes.Buffer
+
 	//2019-01-01 submitted 3456 "please take a look at my homework"
 	dataSubmit := &HwSubmitted{3456, "ABCD", "please take a look at my homework"}
 	LogEvent(dataSubmit, &bufferSubmit)
