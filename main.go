@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"strconv"
 	"time"
 )
 
@@ -24,17 +23,13 @@ type HwAccepted struct {
 }
 
 func (hws *HwSubmitted) Send() []byte {
-	sendTime := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
-	id := strconv.Itoa(hws.Id)
-	comment := string(hws.Comment)
-	return []byte(fmt.Sprintf("%s submitted %s %s\n", sendTime, id, comment))
+	sendTime := time.Now().Format("2006-01-02 15:04:05")
+	return []byte(fmt.Sprintf("%s submitted %d %s\n", sendTime, hws.Id, hws.Comment))
 }
 
 func (hwa *HwAccepted) Send() []byte {
-	sendTime := time.Now().Format("2006-01-02")
-	id := strconv.Itoa(hwa.Id)
-	grade := strconv.Itoa(hwa.Grade)
-	return []byte(fmt.Sprintf("%s accepted %s %s\n", sendTime, id, grade))
+	sendTime := time.Now().Format("2006-01-02 15:04:05")
+	return []byte(fmt.Sprintf("%s accepted %d %d\n", sendTime, hwa.Id, hwa.Grade))
 }
 
 func LogEvent(e Event, w io.Writer) {
